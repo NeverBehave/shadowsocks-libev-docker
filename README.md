@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Shadowsocks-libev Docker Image
 
 [shadowsocks-libev][1] is a lightweight secured socks5 proxy for embedded devices and low end boxes.
@@ -99,3 +100,6 @@ $ docker run -d -p 9000:9000 -p 9000:9000/udp --name ss-libev --restart=always -
 [4]: https://docs.docker.com/install/
 [5]: https://hub.docker.com/r/neverbehave/shadowsocks-libev/
 [6]: https://github.com/shadowsocks/v2ray-plugin#usage
+=======
+# shadowsocks-libev-docker
+>>>>>>> 5ac8bff3078766780b392877077a2fe643a87775
