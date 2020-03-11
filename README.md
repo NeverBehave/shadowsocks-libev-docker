@@ -1,8 +1,14 @@
 # Shadowsocks-libev Docker Image
 
-适合于集群使用，通过环境变量生成配置，无需映射文件
+基于 Based on: https://github.com/teddysun/shadowsocks_install/tree/master/docker/shadowsocks-libev
 
-Suitable for cluster/k8s, generating config from environment variables, no volumn mapping required.
+## Changes 修改
+
+- 适合于集群使用，通过环境变量生成配置，无需映射文件
+    Suitable for cluster/k8s, generating config from environment variables, no volumn mapping required.
+
+- 原`Dockerfile`包含从私人镜像站下载的二进制文件`dl.lamp.sh`，改为从`github`获取
+  The origin dockerfile download binary file from private mirror center `dl.lamp.sh`, changed to download from `github`
 
 ## Intro 
 
