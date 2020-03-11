@@ -1,16 +1,19 @@
-#! /bin/sh
+#!/bin/sh
 
 # Generate json file from ENV
+echo "[I] Generating JSON config file..."
+CONFIG_FOLDER=/etc/shadowsocks-libev/
+mkdir ${CONFIG_FOLDER}
+CONFIG_PATH=${CONFIG_FOLDER}config.json
 
-CONFIG_PATH=/etc/shadowsocks-libev/config.json
+set -e
 
 if [[ -z "${PASSWORD}" ]]; then
   echo '[E] PASSWORD not defined! Exited'
   exit
 fi
 
-read -r -d '' BASE_TEMPLATE << EOM
-{ 
+BASE_TEMPLATE='{ 
     "server":"%s",
     "server_port": %s,
     "password":"%s",
@@ -20,27 +23,24 @@ read -r -d '' BASE_TEMPLATE << EOM
     "nameserver":"%s",
     "mode":"%s"
     %s
-}
-EOM
+}'
 
-read -r -d '' PLUGIN_TEMPLATE << EOM
-    ,
+PLUGIN_TEMPLATE=' ,
     "plugin":"%s",
-    "plugin_opts":"%s"
-EOM
+    "plugin_opts":"%s"'
 
 APPLIED_PLUGIN=''
 
 if [[ -z "${PLUGIN}" ]]; then
   echo '[W] PLUGIN is not defined, skipped'
 else
-  printf "$PLUGIN_TEMPLATE" "$PLUGIN" "$PLUGIN_OPTS" > APPLIED_PLUGIN
+  APPLIED_PLUGIN=$(printf "$PLUGIN_TEMPLATE" "$PLUGIN" "$PLUGIN_OPTS")
 fi
 
 printf "$BASE_TEMPLATE" \
        "$SERVER" "$SERVER_PORT" "$PASSWORD" \
        "$TIMEOUT" "$METHOD" "$FAST_OPEN" \
-       "$NAMESEREVR" "$MODE" \
+       "$NAMESERVER" "$MODE" \
        "$APPLIED_PLUGIN" > ${CONFIG_PATH}
 
 echo "[I] Generated Template: "

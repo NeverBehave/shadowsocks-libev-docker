@@ -2,14 +2,24 @@
 #
 # This is a Shell script for shadowsocks-libev based alpine with Docker image
 # 
-# Copyright (C) 2019 - 2020 Teddysun <i@teddysun.com>
+# Copyright (C) 2019 - 2020 NeverBehave <i@never.pet>
 #
 # Reference URL:
 # https://github.com/shadowsocks/shadowsocks-libev
 # https://github.com/shadowsocks/simple-obfs
 # https://github.com/shadowsocks/v2ray-plugin
+# https://github.com/teddysun/shadowsocks_install
+
+GITHUB_API=https://api.github.com/repos/shadowsocks/v2ray-plugin/releases/latest 
+DOWNLOAD_URL=https://github.com/shadowsocks/v2ray-plugin/releases/download/
+
+TAG_NAME=$(curl ${GITHUB_API} | grep -oP '"tag_name": "\K(.*)(?=")')
+echo "Current V2ray Tag: ${TAG_NAME}"
+
+# @TODO Identify OS version, assume linux for now...
 
 PLATFORM=$1
+echo ${PLATFORM}
 if [ -z "$PLATFORM" ]; then
     ARCH="amd64"
 else
@@ -21,32 +31,37 @@ else
             ARCH="amd64"
             ;;
         linux/arm/v6)
-            ARCH="arm6"
+            ARCH=""
             ;;
         linux/arm/v7)
-            ARCH="arm7"
+            ARCH=""
             ;;
         linux/arm64|linux/arm64/v8)
             ARCH="arm64"
             ;;
-        linux/ppc64le)
-            ARCH="ppc64le"
+        linux/mips)
+            ARCH="mips"
             ;;
         linux/s390x)
-            ARCH="s390x"
+            ARCH=""
             ;;
         *)
             ARCH=""
             ;;
     esac
 fi
+
 [ -z "${ARCH}" ] && echo "Error: Not supported OS Architecture" && exit 1
 # Download v2ray-plugin binary file
-V2RAY_PLUGIN_FILE="v2ray-plugin_linux_${ARCH}"
-echo "Downloading v2ray-plugin binary file: ${V2RAY_PLUGIN_FILE}"
-wget -O /usr/bin/v2ray-plugin https://dl.lamp.sh/files/${V2RAY_PLUGIN_FILE} > /dev/null 2>&1
+V2RAY_PLUGIN_DOWNLOAD_NAME="v2ray-plugin-linux-${ARCH}-${TAG_NAME}.tar.gz"
+V2RAY_FILE_NAME="v2ray-plugin_linux_${ARCH}"
+V2RAY_DOWNLOAD_URL="${DOWNLOAD_URL}${TAG_NAME}/${V2RAY_PLUGIN_DOWNLOAD_NAME}"
+echo "Downloading v2ray-plugin binary file: ${V2RAY_PLUGIN_DOWNLOAD_NAME} From ${V2RAY_DOWNLOAD_URL}"
+wget -P /tmp ${V2RAY_DOWNLOAD_URL} > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to download v2ray-plugin binary file: ${V2RAY_PLUGIN_FILE}" && exit 1
+    echo "Error: Failed to download v2ray-plugin binary file: ${V2RAY_FILE_NAME}" && exit 1
 fi
+tar -xvf "/tmp/${V2RAY_PLUGIN_DOWNLOAD_NAME}"
+mv "${V2RAY_FILE_NAME}" /usr/bin/v2ray-plugin
 chmod +x /usr/bin/v2ray-plugin
-echo "Download v2ray-plugin binary file: ${V2RAY_PLUGIN_FILE} completed"
+echo "Download v2ray-plugin binary file: ${V2RAY_FILE_NAME} completed"

@@ -1,5 +1,10 @@
-<<<<<<< HEAD
-## Shadowsocks-libev Docker Image
+# Shadowsocks-libev Docker Image
+
+适合于集群使用，通过环境变量生成配置，无需映射文件
+
+Suitable for cluster/k8s, generating config from environment variables, no volumn mapping required.
+
+## Intro 
 
 [shadowsocks-libev][1] is a lightweight secured socks5 proxy for embedded devices and low end boxes.
 
@@ -27,59 +32,35 @@ It can be found at [Docker Hub][5].
 
 ## Start a container
 
-Set `env` for the parameter.
+Set Environment Variables, check the table below.
 
-### options
+ Only required values are enforced or container won't work.
 
-Password: Required
+### Environment Variables
 
-A sample in JSON like below:
+| Name        | Accept Value              | Required | Default                |
+| ----------- | ------------------------- | -------- | ---------------------- |
+| SERVER      | IP Address                |          | 0.0.0.0                |
+| SERVER_PORT | Number                    |          | 9000                   |
+| PASSWORD    | String                    | True     |                        |
+| TIMEOUT     | Number                    |          | 300                    |
+| METHOD      | [Check Here][7]           |          | chacha20-ietf-poly1305 |
+| FAST_OPEN   | Boolean                   |          | true                   |
+| NAMESERVER  | IP Addresses              |          | 8.8.8.8,8.8.4.4        |
+| MODE        | tcp, udp, tcp_and_udp     |          | tcp_and_udp            |
+| PLUGIN      | obfs-server, v2ray-plugin |          |                        |
+| PLUGIN_OPTS | Check Below               |          |                        |
 
-```
-{
-    "server":"0.0.0.0",
-    "server_port":9000,
-    "password":"password0",
-    "timeout":300,
-    "method":"chacha20-ietf-poly",
-    "fast_open":true,
-    "nameserver":"8.8.8.8,8.8.4.4",
-    "mode":"tcp_and_udp"
-}
-```
-
-If you want to enable **simple-obfs**, a sample in JSON like below:
+If you want to enable **simple-obfs**, a sample is:
 
 ```
-{
-    "server":"0.0.0.0",
-    "server_port":9000,
-    "password":"password0",
-    "timeout":300,
-    "method":"aes-256-gcm",
-    "fast_open":true,
-    "nameserver":"8.8.8.8",
-    "mode":"tcp_and_udp",
-    "plugin":"obfs-server",
-    "plugin_opts":"obfs=tls"
-}
+-e PLUGIN="obfs-server" -e PLUGIN_OPTS="obfs=tls"
 ```
 
-If you want to enable **v2ray-plugin**, a sample in JSON like below:
+If you want to enable **v2ray-plugin**, a sample is:
 
 ```
-{
-    "server":"0.0.0.0",
-    "server_port":9000,
-    "password":"password0",
-    "timeout":300,
-    "method":"aes-256-gcm",
-    "fast_open":true,
-    "nameserver":"8.8.8.8",
-    "mode":"tcp_and_udp",
-    "plugin":"v2ray-plugin",
-    "plugin_opts":"server"
-}
+-e PLUGIN="v2ray-plugin" -e PLUGIN_OPTS="server"
 ```
 
 For more v2ray-plugin configrations please visit [v2ray-plugin usage][6].
@@ -89,7 +70,7 @@ This container will generate config based on the `env` provided.
 There is an example to start a container that listens on `9000` (both TCP and UDP):
 
 ```bash
-$ docker run -d -p 9000:9000 -p 9000:9000/udp --name ss-libev --restart=always -v /etc/shadowsocks-libev:/etc/shadowsocks-libev neverbehave/shadowsocks-libev
+$ docker run -d -p 9000:9000 -p 9000:9000/udp --name ss-libev --restart=always -e PASSWORD=YOUR_PASSWORD neverbehave/shadowsocks-libev
 ```
 
 **Warning**: The port number must be same as configuration and opened in firewall.
@@ -100,6 +81,4 @@ $ docker run -d -p 9000:9000 -p 9000:9000/udp --name ss-libev --restart=always -
 [4]: https://docs.docker.com/install/
 [5]: https://hub.docker.com/r/neverbehave/shadowsocks-libev/
 [6]: https://github.com/shadowsocks/v2ray-plugin#usage
-=======
-# shadowsocks-libev-docker
->>>>>>> 5ac8bff3078766780b392877077a2fe643a87775
+[7]: https://github.com/shadowsocks/shadowsocks-libev#usage

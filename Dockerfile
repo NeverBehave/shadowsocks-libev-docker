@@ -10,8 +10,6 @@ FROM alpine:latest
 LABEL maintainer="NeverBehave <i@never.pet>"
 
 WORKDIR /root
-COPY v2ray-plugin.sh /root/v2ray-plugin.sh
-COPY entrypoint.sh /root/entrypoint.sh
 RUN set -ex \
 	&& runDeps="git build-base c-ares-dev autoconf automake libev-dev libtool libsodium-dev linux-headers mbedtls-dev pcre-dev" \
 	&& apk add --no-cache --virtual .build-deps ${runDeps} \
@@ -33,26 +31,36 @@ RUN set -ex \
 	tzdata \
 	rng-tools \
 	ca-certificates \
+	curl \
+	tar \
+	grep \
 	$(scanelf --needed --nobanner /usr/bin/ss-* \
 	| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
 	| xargs -r apk info --installed \
 	| sort -u) \
 	&& apk del .build-deps \
 	&& cd /root \
-	&& rm -rf /root/obfs /root/libev \
-	&& chmod +x /root/v2ray-plugin.sh \
-	&& chmod +x /root/entrypoint.sh \
+	&& rm -rf /root/obfs /root/libev
+	
+COPY v2ray-plugin.sh /root/v2ray-plugin.sh
+RUN chmod +x /root/v2ray-plugin.sh \
 	&& /root/v2ray-plugin.sh \
 	&& rm -f /root/v2ray-plugin.sh
+
+COPY entrypoint.sh /root/entrypoint.sh
+RUN chmod +x /root/entrypoint.sh
 
 ENV TZ=Asia/Shanghai \
 	SERVER=0.0.0.0 \
 	SERVER_PORT=9000 \
 	TIMEOUT=300 \
-	METHOD="chacha20-ietf-poly" \
+	METHOD="chacha20-ietf-poly1305" \
 	FAST_OPEN=true \
 	NAMESERVER="8.8.8.8,8.8.4.4" \
-	MODE="tcp_and_udp" 
+	MODE="tcp_and_udp"  \
+	PLUGIN= \
+	PLUGIN_OPTS= \
+	PASSWORD= 
 
-ENTRYPOINT [ "entrypoint.sh" ]
+ENTRYPOINT [ "/root/entrypoint.sh" ]
 CMD [ "ss-server", "-c", "/etc/shadowsocks-libev/config.json" ]
