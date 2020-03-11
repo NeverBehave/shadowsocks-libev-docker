@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# This is a Shell script for generating config json file for Shadowsocks-libev
+# 
+# Copyright (C) 2020 NeverBehave <i@never.pet>
+#
 
 # Generate json file from ENV
 echo "[I] Generating JSON config file..."
